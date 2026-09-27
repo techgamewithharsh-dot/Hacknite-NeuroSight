@@ -1,0 +1,64 @@
+.sketchfab-embed-wrapper {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a1628 0%, #1a2845 100%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(44, 181, 197, 0.2);
+}
+
+.sketchfab-embed-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.sketchfab-embed-wrapper p {
+  display: none;
+}
+
+.brain-model-container {
+  position: relative;
+  margin-bottom: 2rem;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.brain-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(44, 181, 197, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sketchfab-embed-wrapper {
+    height: 300px;
+  }
+
+  .brain-glow {
+    width: 250px;
+    height: 250px;
+  }
+
+  .brain-model-container {
+    margin-bottom: 1.5rem;
+  }
+}

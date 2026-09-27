@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# IDEs
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*.swo
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Large data/checkpoints
+*.pt
+*.pth
+*.onnx
+
+# Local data, generated outputs, and user records
+/data/
+/logs/
+/exports/
+/uploads/
+*.dcm
+*.nii
+*.nii.gz
+
+# Local dependencies and caches
+/node_modules/
+/.pnpm-store/
+**/node_modules/
+**/.pnpm-store/
+
+# Local credentials and agent memory
+.env
+.env.*
+!.env.example
+!**/.env.example
+**/.agents/
+**/.codex/

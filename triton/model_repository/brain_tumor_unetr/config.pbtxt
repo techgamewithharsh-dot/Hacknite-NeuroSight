@@ -1,0 +1,30 @@
+name: "brain_tumor_unetr"
+platform: "pytorch_libtorch"
+max_batch_size: 4
+
+input [
+  {
+    name: "INPUT__0"
+    data_type: TYPE_FP32
+    dims: [ 4, 96, 96, 96 ]
+  }
+]
+
+output [
+  {
+    name: "OUTPUT__0"
+    data_type: TYPE_FP32
+    dims: [ 3, 96, 96, 96 ]
+  }
+]
+
+dynamic_batching {
+  max_queue_delay_microseconds: 50000
+}
+
+instance_group [
+  {
+    count: 1
+    kind: KIND_GPU
+  }
+]

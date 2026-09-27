@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "NeuroSight MRI Analyzer"
+description = "A focused clinical workstation for comparing baseline and follow-up MRI scans, reviewing tumor progression verdicts, and inspecting volumetric and inference telemetry without changing the underlying analyzer contract."
+version = "1.0.0"
+id = "artifacts/neurosight-analyzer"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22373
+
+[services.development]
+run = "pnpm --filter @workspace/neurosight-analyzer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/neurosight-analyzer", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/neurosight-analyzer/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22373"
+BASE_PATH = "/"

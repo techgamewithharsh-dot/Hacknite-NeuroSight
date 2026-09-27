@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  triton-server:
+    image: nvcr.io/nvidia/tritonserver:24.01-py3
+    container_name: hacknite_triton_brain_tumor
+    ports:
+      - "8003:8000" # Triton HTTP (API uses host port 8000)
+      - "8001:8001" # gRPC inference endpoint
+      - "8004:8002" # Prometheus metrics endpoint
+    volumes:
+      - ./model_repository:/models
+    command: ["tritonserver", "--model-repository=/models", "--strict-model-config=false", "--model-control-mode=explicit", "--load-model=brats_mri_segmentation"]
+    # Uncomment deploy section if running on an NVIDIA GPU host:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped

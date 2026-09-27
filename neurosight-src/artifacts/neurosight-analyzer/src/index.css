@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 220 24% 4%;
+  --foreground: 210 32% 92%;
+  --border: 214 23% 17%;
+  --input: 214 23% 24%;
+  --ring: 180 92% 54%;
+  --card: 220 23% 7%;
+  --card-foreground: 210 32% 92%;
+  --card-border: 214 23% 18%;
+  --primary: 180 92% 54%;
+  --primary-foreground: 220 28% 5%;
+  --secondary: 215 23% 12%;
+  --secondary-foreground: 210 32% 88%;
+  --muted: 216 24% 12%;
+  --muted-foreground: 215 16% 58%;
+  --accent: 316 90% 63%;
+  --accent-foreground: 320 25% 8%;
+  --destructive: 2 83% 62%;
+  --destructive-foreground: 0 0% 100%;
+  --sidebar: 220 28% 5%;
+  --sidebar-foreground: 210 32% 92%;
+  --radius: 0.65rem;
+  --app-font-sans: 'DM Sans', sans-serif;
+  --app-font-mono: 'DM Mono', monospace;
+  --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.34);
+}
+
+.dark {
+  --background: 205 38% 10%;
+  --foreground: 192 31% 91%;
+  --border: 205 26% 25%;
+  --input: 205 26% 29%;
+  --ring: 183 66% 48%;
+  --card: 205 34% 14%;
+  --card-foreground: 192 31% 91%;
+  --card-border: 205 26% 25%;
+  --primary: 183 66% 48%;
+  --primary-foreground: 205 38% 10%;
+  --secondary: 205 26% 23%;
+  --secondary-foreground: 192 31% 91%;
+  --muted: 205 27% 19%;
+  --muted-foreground: 198 15% 65%;
+  --accent: 39 84% 58%;
+  --accent-foreground: 34 53% 16%;
+  --destructive: 2 63% 57%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+* { box-sizing: border-box; }
+html { background: hsl(var(--background)); }
+body {
+  margin: 0;
+  min-width: 320px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--app-font-sans);
+  font-feature-settings: "ss01" 1, "cv11" 1;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+.field-input {
+  width: 100%;
+  border: 1px solid hsl(var(--input));
+  border-radius: .5rem;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  padding: .65rem .75rem;
+  font-size: 12px;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.field-input::placeholder { color: hsl(var(--muted-foreground)); }
+.field-input:focus { border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary) / .11); }
+.field-input option { background: hsl(var(--card)); color: hsl(var(--foreground)); }
+.glass-panel {
+  background: linear-gradient(135deg, rgba(13, 25, 31, .76), rgba(5, 10, 15, .68));
+  border-color: rgba(103, 228, 220, .16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055), 0 20px 55px rgba(0, 0, 0, .25);
+  backdrop-filter: blur(18px) saturate(1.18);
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+  transition: border-color .35s ease, box-shadow .35s ease, transform .35s cubic-bezier(.2,.8,.2,1);
+}
+.glass-panel:hover {
+  border-color: rgba(103, 228, 220, .28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 24px 70px rgba(0, 0, 0, .34), 0 0 30px rgba(31, 214, 210, .06);
+}
+.motion-lift {
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, border-color .3s ease;
+}
+.motion-lift:hover { transform: translateY(-3px); }
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scanline {
+  from { transform: translateY(-100%); opacity: 0; }
+  30% { opacity: .6; }
+  to { transform: translateY(230%); opacity: 0; }
+}
+@keyframes ambient-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: .55; }
+  50% { transform: translate3d(10px, -8px, 0) scale(1.04); opacity: .9; }
+}
+@keyframes glass-breathe {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(64, 239, 228, .1), 0 0 22px rgba(26, 209, 201, .08); }
+  50% { box-shadow: 0 0 0 1px rgba(64, 239, 228, .18), 0 0 34px rgba(26, 209, 201, .15); }
+}
+@keyframes brain-field {
+  0%, 100% { opacity: .55; transform: rotateX(68deg) rotateZ(-16deg) scale(.98); }
+  50% { opacity: .95; transform: rotateX(68deg) rotateZ(-13deg) scale(1.02); }
+}
+@keyframes terminal-row-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-rise { animation: rise-in .45s ease-out both; }
+.neon-glow { animation: glass-breathe 5s ease-in-out infinite; }
+.ambient-float { animation: ambient-drift 7s ease-in-out infinite; }
+.brain-orbit-grid { animation: brain-field 8s ease-in-out infinite; }
+.terminal-row { animation: terminal-row-in .42s cubic-bezier(.2,.8,.2,1) both; }
+.scan-surface::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0; height: 1px;
+  background: rgba(178, 241, 236, .5);
+  animation: scanline 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.mono { font-family: var(--app-font-mono); }
+.section-label {
+  color: hsl(var(--muted-foreground));
+  font-family: var(--app-font-mono);
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.clinical-grid {
+  background-image: linear-gradient(rgba(75, 225, 224, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(75, 225, 224, .05) 1px, transparent 1px),
+    radial-gradient(circle at 70% 5%, rgba(31, 214, 210, .08), transparent 30%);
+  background-size: 28px 28px, 28px 28px, auto;
+}
+.neon-glow {
+  box-shadow: 0 0 0 1px rgba(64, 239, 228, .12), 0 0 28px rgba(26, 209, 201, .13);
+}
+.brain-stage {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.brain-orbit {
+  transform-style: preserve-3d;
+  transition: transform .12s ease-out;
+  will-change: transform;
+}
+.brain-orbit-grid {
+  position: absolute;
+  inset: 13% 12%;
+  border: 1px solid rgba(64, 239, 228, .17);
+  border-radius: 50%;
+  transform: rotateX(68deg) rotateZ(-16deg);
+  box-shadow: 0 0 0 15px rgba(64, 239, 228, .03), 0 0 0 32px rgba(64, 239, 228, .02);
+}
+.brain-orbit-grid::before,
+.brain-orbit-grid::after {
+  content: "";
+  position: absolute;
+  inset: 13%;
+  border: 1px dashed rgba(246, 73, 194, .3);
+  border-radius: 50%;
+}
+.brain-orbit-grid::after {
+  transform: rotateY(76deg);
+}
+.brain-model-svg {
+  filter: drop-shadow(0 0 18px rgba(48, 236, 224, .15));
+  overflow: visible;
+}
+.terminal-scanline {
+  background: linear-gradient(180deg, transparent, rgba(84, 235, 218, .09), transparent);
+  animation: terminal-scan 3.5s linear infinite;
+}
+@keyframes terminal-scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(260%); }
+}
+.terminal-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 5px;
+  vertical-align: -2px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 12px hsl(var(--primary));
+  animation: cursor-blink 1s steps(2, start) infinite;
+}
+@keyframes cursor-blink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
