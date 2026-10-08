@@ -1,123 +1,114 @@
-# 🧠 Real-Time Multi-Modal Brain Tumor Progression & Pseudo-Progression Analyzer
-### *Hacknite 2026 High-Impact Healthcare AI Project*
+# NeuroSight — Brain MRI Segmentation & Progression Analysis Prototype
 
-[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![NVIDIA MONAI](https://img.shields.io/badge/NVIDIA-MONAI_Core-76B900.svg)](https://monai.io/)
-[![NVIDIA Triton](https://img.shields.io/badge/NVIDIA-Triton_Inference_Server-76B900.svg)](https://developer.nvidia.com/nvidia-triton-inference-server)
-[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-[![Streamlit](https://img.shields.io/badge/UI-Streamlit_Terminal-FF4B4B.svg)](https://streamlit.io/)
+A Hacknite 2026 research prototype for comparing baseline and follow-up brain MRI scans. NeuroSight combines Python, MONAI/PyTorch segmentation, a FastAPI backend, a browser interface, and a Streamlit viewer to explore longitudinal imaging and 3D visualization.
 
----
+**Research and demonstration use only.** The repository does not establish clinical validation. Displayed verdicts and confidence scores must not be treated as diagnoses or measured clinical accuracy. See the [model documentation](models/README.md) for model provenance and limitations.
 
-## 1. The Core Clinical Problem
-In neuro-oncology, post-chemoradiation brain MRI scans for glioblastoma patients are notoriously difficult to interpret. When a lesion expands on follow-up imaging, clinicians face a critical dilemma:
-* **True Tumor Progression (TP):** Aggressive cancer recurrence requiring immediate surgical re-intervention or second-line oncology regimens.
-* **Pseudo-Progression (PsP) / Radiation Necrosis:** A benign, transient inflammatory cascade with blood-brain barrier disruption caused by radiation therapy that will stabilize or regress without changing therapy.
+## Explore the project
 
-**The Clinical Consequence:** Misdiagnosis leads to either unnecessary invasive brain re-resections or fatal delays in switching cancer therapies.
+- **MRI segmentation:** four-channel T1c, T1, T2, and FLAIR input using a MONAI BraTS SegResNet model.
+- **Longitudinal comparison:** volumetric changes and progression-related outputs.
+- **Visualization:** browser and Streamlit interfaces, with mesh generation and atlas-registration code.
+- **Synthetic cases:** a generator for exploring the demonstration workflow.
+- **Optional inference serving:** NVIDIA Triton, with local MONAI inference when Triton is unavailable and the checkpoint is present.
 
----
+[Setup](#local-setup) · [Repository map](#repository-map) · [API](#api-and-example-data) · [Tests](#verification) · [Model details](models/README.md)
 
-## 2. Front-End Web Applications
+## Local setup
 
-We provide two complementary interfaces:
+Use a Python 3.12 environment, as targeted by the original project documentation. Start from the repository root:
 
-### A. Dark-Mode Clinical Diagnostic Web Terminal (`frontend/` + FastAPI)
-* **Aesthetic:** Dark-mode clinical diagnostic terminal (deep obsidian `#070A11`, glowing neon indicators).
-* **Core Workflow:**
-  1. **Dual Drag-and-Drop Landing Zone:** Ingests Timepoint A (Baseline `.nii.gz`) and Timepoint B (Follow-up `.nii.gz`) with file size validation.
-  2. **Live Pipeline Telemetry Console:** Monospace console terminal streaming step-by-step progress from MONAI transforms (`Spacingd`, `Orientationd`) to Triton dynamic batching and inference.
-  3. **High-Impact Verdict Dashboard:**
-     - Massive color-coded banner (`🔴 CRITICAL: TRUE TUMOR PROGRESSION` vs. `🟢 SAFE: RADIATION NECROSIS / PSEUDO-PROGRESSION`).
-     - Diagnostic Confidence percentage (e.g., 98.0%).
-     - Volumetric Delta metrics & Growth Velocity rate ($\text{cm}^3/\text{month}$).
-     - Visual comparative slice viewer displaying the volumetric expansion vector.
-
-Launch with:
-```bash
-./scripts/run_api.sh
+```sh
+git clone https://github.com/techgamewithharsh-dot/Hacknite-NeuroSight.git
+cd Hacknite-NeuroSight
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
-Open in browser: 👉 **`http://localhost:8000`**
 
-### B. Integrated Streamlit Diagnostic HUD (`app.py`)
-Launch with:
-```bash
-./scripts/run_app.sh
+On Windows, activate the environment with `.venv\Scripts\activate`.
+
+### Model weights are required for segmentation
+
+The segmentation implementation expects a pretrained checkpoint at `models/brats_mri_segmentation.pt`, or the path supplied through `NEUROSIGHT_MONAI_WEIGHTS`. This checkpoint is not bundled in the public checkout.
+
+Read [models/README.md](models/README.md) for the upstream MONAI bundle and expected channels. The helper below downloads the bundle and copies its checkpoint to a different location:
+
+```sh
+python scripts/download_models.py --bundle brats_mri_segmentation
+export NEUROSIGHT_MONAI_WEIGHTS="$PWD/triton/model_repository/brain_tumor_segresnet/weights.pth"
 ```
-Open in browser: 👉 **`http://localhost:8501`**
 
----
+Confirm that the download succeeded and that this file exists before starting segmentation. The current segmenter raises an error if the checkpoint is missing; Triton being optional does not make the checkpoint optional.
 
-## 3. Input & Output API Contracts (`api/schemas.py`)
+### Launch the browser interface
 
-The FastAPI backend enforces structured Pydantic contracts:
+```sh
+python -m uvicorn api.server:app --host 127.0.0.1 --port 8000
+```
 
-### Input Schema (`POST /api/v1/analyze/preset` or `/upload`)
+Open **http://localhost:8000** for the frontend and **http://localhost:8000/docs** for the generated API reference. The API has a synthetic-case generation path when sample cases are absent.
+
+### Launch the Streamlit interface
+
+In the activated environment:
+
+```sh
+streamlit run app.py --server.port=8501 --server.address=127.0.0.1
+```
+
+Open **http://localhost:8501**.
+
+Optional Triton deployment instructions are in [models/README.md](models/README.md). Set `NEUROSIGHT_USE_TRITON=0` to force local model inference.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| [api/server.py](api/server.py) | FastAPI routes and frontend serving |
+| [api/schemas.py](api/schemas.py) | Request and response models |
+| [core/](core/) | Segmentation, progression analysis, registration, and mesh generation |
+| [frontend/](frontend/) | Built browser frontend |
+| [neurosight-src/](neurosight-src/) | Frontend and related TypeScript source workspace |
+| [app.py](app.py) and [ui/](ui/) | Streamlit application and visualization |
+| [data_generator/](data_generator/) | Synthetic demonstration case generation |
+| [models/README.md](models/README.md) | Model provenance and serving setup |
+| [tests/](tests/) | API, progression, atlas, and GLB checks |
+
+## API and example data
+
+Inspect **/docs** on the running local server for the endpoint-specific request formats. The preset analysis route is `POST /api/v1/analyze/preset`; upload routes have their own input requirements.
+
+Example preset request, using an ID that must exist in your generated cases:
+
 ```json
 {
   "preset_case_id": "case_001_true_progression",
-  "patient_id": "PT-84920",
+  "patient_id": "DEMO-001",
   "scan_interval_days": 90,
   "radiation_completion_interval": "90 Days post-radiation"
 }
 ```
 
-### Output Schema (`ProgressionAnalysisResponse`)
-```json
-{
-  "success": true,
-  "patient_metadata": {
-    "patient_id": "PT-84920",
-    "scan_interval_days": 90
-  },
-  "verdict_card": {
-    "verdict": "TRUE_TUMOR_PROGRESSION",
-    "verdict_display_title": "CRITICAL: TRUE TUMOR PROGRESSION",
-    "confidence_score": 98.0,
-    "ppri_score": 2.0,
-    "banner_theme": "alert-red",
-    "alert_badge": "CRITICAL: ACTIVE GLIOBLASTOMA RECURRENCE",
-    "rano_category": "Progressive Disease (PD)",
-    "clinical_rationale": "Aggressive nodular enhancing tumor expansion...",
-    "actionable_recommendation": "Urgent neuro-oncology tumor board review."
-  },
-  "volumetric_metrics": {
-    "absolute_change_cm3": 18.35,
-    "relative_change_pct": 742.0,
-    "growth_velocity_cm3_per_month": 6.12,
-    "enhancing_tumor_delta_cm3": 12.11,
-    "edema_delta_cm3": 6.25,
-    "edema_to_enhancing_ratio_delta": -1.2
-  },
-  "expansion_vector": {
-    "centroid_displacement_mm": 10.4,
-    "expansion_direction": "Anterior-Lateral",
-    "infiltrative_spread_score": 8.3
-  },
-  "telemetry_logs": [ ... ],
-  "serving_backend": "NVIDIA Triton Inference Server",
-  "total_pipeline_latency_ms": 32.4
-}
-```
+The response schema includes patient metadata, a verdict card, volumetric metrics, an expansion vector, telemetry, and serving-backend information. Refer to [api/schemas.py](api/schemas.py) for current fields.
 
----
+The included case generator creates synthetic examples. Values shown by those examples, including confidence percentages and timings, are demonstration outputs rather than validation on a clinical cohort.
 
-## 4. Benchmark Clinical Cases
+## Verification
 
-* **Case 001 — True Glioblastoma Progression (Recurrence):**
-  - **Verdict:** `TRUE_TUMOR_PROGRESSION` (`PPRI = 2.0%`, Confidence: `98.0%`)
-  - **Volumetric Delta:** +12.11 cm³ Enhancing Tumor (+953.2%), Growth Velocity: +6.12 cm³/month
-  - **Expansion Vector:** 10.4 mm invasive centroid shift
-* **Case 002 — Radiation Necrosis (Pseudo-Progression):**
-  - **Verdict:** `RADIATION_NECROSIS_PSEUDOPROGRESSION` (`PPRI = 98.0%`, Confidence: `98.0%`)
-  - **Volumetric Delta:** +42.36 cm³ Edema Flare (+602.7%), Enhancing Tumor stable (+3.2%)
-  - **Expansion Vector:** Stationary centroid, low infiltrative spread
+After installing dependencies and any required model/data assets:
 
----
-
-## 5. Automated Verification Tests
-
-Run the full verification test suite:
-```bash
+```sh
 python -m unittest discover -s tests -p "test_*.py"
 ```
+
+## Troubleshooting
+
+- **Missing pretrained weights:** check `NEUROSIGHT_MONAI_WEIGHTS` and the file created by the download helper.
+- **Triton unavailable:** local MONAI inference still requires the same trained checkpoint.
+- **Missing sample cases:** inspect startup output or run `python data_generator/generate_synthetic_cases.py`.
+- **Installation failure:** include the Python version, platform, and failing dependency when reporting it. Dependencies currently use minimum-version constraints, so installations can change over time.
+
+## Contributing and feedback
+
+[Open an issue](https://github.com/techgamewithharsh-dot/Hacknite-NeuroSight/issues) with reproduction steps, expected behavior, and a synthetic example. Useful contributions include reproducible setup instructions, dependency compatibility fixes, and tests for failure cases. Never include identifiable patient data in a public issue.
